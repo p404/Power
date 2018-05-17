@@ -1,18 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import io
-import yaml
 import socket
 import wakeonlan
 from pathlib import Path
 from paramiko import Transport, SSHClient, SSHConfig, ProxyCommand
 
 HOME_PATH = str(Path.home())
-
-with open("/Users/pablo/.patron/config.yml", 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
-
-servers = cfg['hosts']
 
 def ssh_connection(hostname):
     config = SSHConfig()
@@ -46,8 +40,5 @@ class Power():
             ssh_client.exec_command('sudo poweroff')
             print("Turning off: {}".format(hostname))
 
-
-#Power.turn_on(servers)
-Power.turn_off(servers)
 
 

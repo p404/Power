@@ -1,5 +1,12 @@
+import yaml
+from core import Power
 from cement.core.foundation import CementApp
 from cement.ext.ext_argparse import ArgparseController, expose
+
+with open("/Users/pablo/.patron/config.yml", 'r') as ymlfile:
+    cfg = yaml.load(ymlfile)
+
+servers = cfg['hosts']
 
 class BaseController(ArgparseController):
     class Meta:
@@ -29,6 +36,7 @@ class PowerController(ArgparseController):
             elif self.app.pargs.tags:
                 print(self.app.pargs.tags)
         else:
+            Power.turn_on(servers)
             self.app.log.info('Turning on all machines')
 
     @expose(arguments=[
@@ -41,6 +49,7 @@ class PowerController(ArgparseController):
         if self.app.pargs.hosts or self.app.pargs.tags:
             print('he')
         else:
+            Power.turn_off(servers)
             self.app.log.info('Turning of all machines')
 
 class PowerCLI(CementApp):
