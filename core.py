@@ -23,6 +23,8 @@ def ssh_connection(hostname):
         ssh_client.connect(host['hostname'], username=host['user'])
         return ssh_client
 
+def host_is_up():
+    pass 
 
 class Power():
     @staticmethod
@@ -30,7 +32,7 @@ class Power():
         for host in hosts:
             try:
                 wakeonlan.send_magic_packet(hosts[host]['mac'])
-                print("Turning on: {}".format(host))
+                print("{}".format(host))
             except:
                 pass
     @staticmethod
@@ -38,7 +40,7 @@ class Power():
         for hostname in hosts:
             ssh_client = ssh_connection(hostname)
             ssh_client.exec_command('sudo poweroff')
-            print("Turning off: {}".format(hostname))
+            print("{}".format(hostname))
 
 
 

@@ -1,12 +1,8 @@
 import yaml
+import filter_by
 from core import Power
 from cement.core.foundation import CementApp
 from cement.ext.ext_argparse import ArgparseController, expose
-
-with open("/Users/pablo/.patron/config.yml", 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
-
-servers = cfg['hosts']
 
 class BaseController(ArgparseController):
     class Meta:
@@ -24,35 +20,60 @@ class PowerController(ArgparseController):
         stacked_type = 'embedded'
 
     @expose(arguments=[
-                (['--hosts', '-hosts'], {'help': 'Turn on machines by hostname', 'action':'store'}),
-                (['--tags', '-t'], {'help': 'Turn on machines by tags', 'action': 'store'})
+                (['--hosts', '-hosts'], {'help': 'Turn on machines by hostname', 'action':'store', 'nargs': '*'}),
+                (['--tag', '-t'], {'help': 'Turn on machines by a tag', 'action': 'store'})
             ],
             help="Turn on machines"
     )
     def on(self):
-        if self.app.pargs.hosts or self.app.pargs.tags:
+        if self.app.pargs.hosts or self.app.pargs.tag:
             if self.app.pargs.hosts:
-                print(self.app.pargs.hosts)
-            elif self.app.pargs.tags:
-                print(self.app.pargs.tags)
+                self.app.log.info('Turning on machines')
+                for host in self.app.pargs.hosts:
+                    server = filter_by.host(host)
+                    if bool(server) == False:
+                        self.app.log.fatal("Servers {} not found".format(host))        
+                    else:
+                        Power.turn_on(server)
+            elif self.app.pargs.tag:
+                servers = filter_by.tag(self.app.pargs.tag)
+                if bool(servers) == False:
+                    self.app.log.fatal("Servers with a tag {} not found".format(self.app.pargs.tag))        
+                else:
+                    self.app.log.info('Turning on machines')
+                    Power.turn_on(servers)
         else:
-            Power.turn_on(servers)
+            Power.turn_on(filter_by.SERVERS)
             self.app.log.info('Turning on all machines')
 
     @expose(arguments=[
-                (['--hosts', '-hosts'], {'help': 'Turn off machines by hostname', 'action':'store'}),
-                (['--tags', '-t'], {'help': 'Turn off machines by tags', 'action': 'store'})
+                (['--hosts', '-hosts'], {'help': 'Turn off machines by hostname', 'action':'store', 'nargs': '*'}),
+                (['--tag', '-t'], {'help': 'Turn off machines by tag', 'action': 'store'})
             ],
             help="Turn off machines"
     )
     def off(self):
-        if self.app.pargs.hosts or self.app.pargs.tags:
-            print('he')
+        if self.app.pargs.hosts or self.app.pargs.tag:
+            if self.app.pargs.hosts:
+                self.app.log.info('Turning on machines')
+                for host in self.app.pargs.hosts:
+                    server = filter_by.host(host)
+                    if bool(server) == False:
+                        self.app.log.fatal("Servers {} not found".format(host))        
+                    else:
+                        Power.turn_off(server)
+            elif self.app.pargs.tag:
+                servers = filter_by.tag(self.app.pargs.tag)
+                if bool(servers) == False:
+                    self.app.log.fatal("Servers with a tag {} not found".format(self.app.pargs.tag))        
+                else:
+                    self.app.log.info('Turning off machines')
+                    Power.turn_off(servers)
         else:
-            Power.turn_off(servers)
+            Power.turn_off(filter_by.SERVERS)
             self.app.log.info('Turning of all machines')
 
 class PowerCLI(CementApp):
     class Meta:
-        label = 'wol'
+        label = 'power'
         handlers = [BaseController, PowerController]
