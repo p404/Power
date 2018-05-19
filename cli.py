@@ -43,8 +43,8 @@ class PowerController(ArgparseController):
                     self.app.log.info('Turning on machines')
                     Power.turn_on(servers)
         else:
-            Power.turn_on(filter_by.SERVERS)
             self.app.log.info('Turning on all machines')
+            Power.turn_on(filter_by.SERVERS)
 
     @expose(arguments=[
                 (['--hosts', '-hosts'], {'help': 'Turn off machines by hostname', 'action':'store', 'nargs': '*'}),
@@ -70,8 +70,8 @@ class PowerController(ArgparseController):
                     self.app.log.info('Turning off machines')
                     Power.turn_off(servers)
         else:
-            Power.turn_off(filter_by.SERVERS)
             self.app.log.info('Turning of all machines')
+            Power.turn_off(filter_by.SERVERS)
 
 class PowerCLI(CementApp):
     class Meta:
