@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import os
 import io
@@ -25,12 +24,18 @@ def nmap_host(hostname):
     nmap_obj = nmap.PortScanner()
     port = ssh_config(hostname)['port']
     host_scan = nmap_obj.scan(hostname, str(port))
-    if host_scan['scan'][socket.gethostbyname(hostname)]['status']['state'] == 'up':
+    try: 
+        host_scan['scan'][socket.gethostbyname(hostname)]['status']['state'] == 'up'
         return True
+    except:
+        return False
 
 def host_is_up(hostname):
-    if ping(hostname) or nmap_host(hostname):
+    if ping(hostname):
         return True
+    else:
+        if nmap_host(hostname):
+            return True
 
 def ssh_connection(hostname):
     host = ssh_config(hostname)
@@ -50,7 +55,7 @@ class Power():
         for host in hosts:
             if not host_is_up(host):
                 wakeonlan.send_magic_packet(hosts[host]['mac'])
-                print("{}".format(host))
+                print("Turning on {}".format(host))
             else:
                 print("Host {} already turned on".format(host))
 
@@ -58,10 +63,13 @@ class Power():
     def turn_off(hosts):
         for hostname in hosts:
             if host_is_up(hostname):
-                ssh_client = ssh_connection(hostname)
-                ssh_client.exec_command('sudo poweroff')
-                ssh_client.close()
-                print("{}".format(hostname))
+                try: 
+                    ssh_client = ssh_connection(hostname)
+                    _stdin, _stdout, stderr = ssh_client.exec_command('sudo poweroff')
+                    print(stderr.readlines())
+                    print("Turning off {}".format(hostname))
+                    ssh_client.close()
+                except:
+                    print('Error')
             else:
                 print("Host {} already turned off".format(hostname))
-
