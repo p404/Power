@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import os
 import io
+import time
 import nmap
 import pprint
 import socket
@@ -65,8 +66,8 @@ class Power():
             if host_is_up(hostname):
                 try: 
                     ssh_client = ssh_connection(hostname)
-                    _stdin, _stdout, stderr = ssh_client.exec_command('sudo poweroff')
-                    print(stderr.readlines())
+                    time.sleep(2)
+                    ssh_client.exec_command('sudo poweroff')
                     print("Turning off {}".format(hostname))
                     ssh_client.close()
                 except:
