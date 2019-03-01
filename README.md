@@ -6,7 +6,7 @@ Power, Tool for managing power state of multiples machines using Wakeonlan/SSH
 ```bash
 1. git clone https://github.com/p404/power.git
 2. cd power
-3. pip3 install .
+3. pip3 install -r requirements.txt
 ```
 ## Usage
 ```bash
